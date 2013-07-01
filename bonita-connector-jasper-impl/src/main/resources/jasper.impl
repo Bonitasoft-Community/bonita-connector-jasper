@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<implementation:connectorImplementation xmlns:implementation="http://www.bonitasoft.org/ns/connector/implementation/6.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<definitionId>jasper</definitionId>
+	<definitionVersion>1.0.0</definitionVersion>
+	<description>Implementation based on jasper 5.0.4</description>
+	<implementationClassname>org.bonitasoft.connectors.jasper.CreateReportFromDataBase</implementationClassname>
+	<implementationId>jasper-impl</implementationId>
+	<implementationVersion>1.0.3</implementationVersion>
+
+$Dependencies$
+
+</implementation:connectorImplementation>
