@@ -15,7 +15,7 @@
 	<input name="parameters" type="java.util.List" />
 	<input name="outputFormat" type="java.lang.String" mandatory="true" />
 
-	<output name="reportDocValue" type="org.bonitasoft.engine.bpm.model.document.DocumentValue" />
+	<output name="reportDocValue" type="org.bonitasoft.engine.bpm.document.DocumentValue" />
 	
 	<page id="DataBaseConfiguration">
 		<widget id="dbDriver" inputName="dbDriver" xsi:type="definition:Text" />
