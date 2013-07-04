@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition:ConnectorDefinition xmlns:definition="http://www.bonitasoft.org/ns/connector/definition/6.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<id>jasper</id>
+	<version>1.0.0</version>
+	<icon>jasper.png</icon>
+	<category id="Jasper" icon="jasper.png" />
+
+	<input name="dbDriver" type="java.lang.String" mandatory="true" defaultValue="com.mysql.jdbc.Driver" />
+	<input name="jdbcUrl" type="java.lang.String" mandatory="true" defaultValue="jdbc:mysql://localhost/your_database_name" />
+	<input name="user" type="java.lang.String" mandatory="true" />
+	<input name="password" type="java.lang.String" />
+	<input name="jrxmlDocument" type="java.lang.String" mandatory="true" />
+	<input name="parameters" type="java.util.List" />
+	<input name="outputFormat" type="java.lang.String" mandatory="true" />
+
+	<output name="reportDocValue" type="org.bonitasoft.engine.bpm.document.DocumentValue" />
+	
+	<page id="DataBaseConfiguration">
+		<widget id="dbDriver" inputName="dbDriver" xsi:type="definition:Text" />
+		<widget id="jdbcUrl" inputName="jdbcUrl" xsi:type="definition:Text" />
+		<widget id="user" inputName="user" xsi:type="definition:Text" />
+		<widget id="password" inputName="password" xsi:type="definition:Password" />
+	</page>
+	<page id="ReportSettings">
+		<widget id="jrxmlDocument" inputName="jrxmlDocument" xsi:type="definition:Text" showDocuments="true" />
+		<widget id="parameters" inputName="parameters" xsi:type="definition:Array" cols="2" rows="-1" fixedCols="true" fixedRows="false">
+			<colsCaption>name</colsCaption>
+			<colsCaption>value</colsCaption>
+		</widget>
+		<widget id="outputFormat" inputName="outputFormat" xsi:type="definition:Select" readOnly="false">
+			<items>PDF</items>
+			<items>HTML</items>
+			<items>XML</items>
+		</widget>
+	</page>
+</definition:ConnectorDefinition>
