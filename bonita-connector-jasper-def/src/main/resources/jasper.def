@@ -4,7 +4,7 @@
 	<version>1.0.0</version>
 	<icon>jasper.png</icon>
 	
-	<category id="reporting" icon="reporting.png"/>
+	<category id="reporting" icon="Reporting.png"/>
 	<category id="Jasper" icon="jasper.png" parentCategoryId="reporting" />
 
 	<input name="dbDriver" type="java.lang.String" mandatory="true" defaultValue="com.mysql.jdbc.Driver" />
