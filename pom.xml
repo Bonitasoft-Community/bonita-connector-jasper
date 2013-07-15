@@ -35,6 +35,6 @@
     </build>
 
     <scm>
-        <developerConnection>scm:svn:https://svn.bonitasoft.org/bonita-connectors-6/trunk/connectors/bonita-connector-jasper/</developerConnection>
+        <developerConnection>scm:git:git@github.com:bonitasoft/bonita-connector-jasper.git</developerConnection>
     </scm>
 </project>
