@@ -36,5 +36,8 @@
 
     <scm>
         <developerConnection>scm:git:git@github.com:bonitasoft/bonita-connector-jasper.git</developerConnection>
+        <connection>scm:git:git@github.com:bonitasoft/bonita-connector-jasper.git</connection>
+        <url>https://github.com/bonitasoft/bonita-connector-jasper</url>
+        <tag>HEAD</tag>
     </scm>
 </project>
