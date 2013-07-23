@@ -150,9 +150,6 @@ public class CreateReportFromDataBase extends AbstractConnector {
         initInputs();
         final List<String> errors = new ArrayList<String>();
 
-        if (dbDriver == null || dbDriver.trim().length() == 0) {
-            errors.add("dbDriver cannot be empty!");
-        }
         if (jdbcUrl == null || jdbcUrl.trim().length() == 0) {
             errors.add("jdbcUrl cannot be empty!");
         }
