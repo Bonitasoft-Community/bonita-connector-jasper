@@ -149,16 +149,9 @@ public class CreateReportFromDataBase extends AbstractConnector {
 	public void validateInputParameters() throws ConnectorValidationException {
 		initInputs();
 		final List<String> errors = new ArrayList<String>();
-
-		//        if (dbDriver == null || dbDriver.trim().length() == 0) {
-		//            errors.add("dbDriver cannot be empty!");
-		//        }
-		//        if (jdbcUrl == null || jdbcUrl.trim().length() == 0) {
-		//            errors.add("jdbcUrl cannot be empty!");
-		//        }
-		if (jrxmlDocument == null || jrxmlDocument.trim().length() == 0) {
-			errors.add("jrxmlDocument cannot be empty!");
-		}
+        if (jrxmlDocument == null || jrxmlDocument.trim().length() == 0) {
+            errors.add("jrxmlDocument cannot be empty!");
+        }
 
 		Long processInstanceId = getExecutionContext().getProcessInstanceId();
 		try {

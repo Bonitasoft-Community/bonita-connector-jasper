@@ -5,11 +5,10 @@
 	<parent>
 		<artifactId>bonita-connectors</artifactId>
 		<groupId>org.bonitasoft.connectors</groupId>
-		<version>6.1.0-rc-01</version>
+        <version>6.1.0-SNAPSHOT</version>
 	</parent>
 	
 	<artifactId>bonita-connector-jasper</artifactId>
-    <version>6.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
 	<name>bonita-connector-jasper</name>
@@ -25,16 +24,14 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.4</version>
-                <configuration>
-                    <tagBase>https://svn.bonitasoft.org/bonita-connectors-6/tags/connectors/bonita-connector-jasper</tagBase>
-                    <preparationGoals>clean install</preparationGoals>
-                    <goals>deploy</goals>
-                </configuration>
             </plugin>
         </plugins>
     </build>
 
     <scm>
-        <developerConnection>scm:svn:https://svn.bonitasoft.org/bonita-connectors-6/trunk/connectors/bonita-connector-jasper/</developerConnection>
+        <developerConnection>scm:git:git@github.com:bonitasoft/bonita-connector-jasper.git</developerConnection>
+        <connection>scm:git:git@github.com:bonitasoft/bonita-connector-jasper.git</connection>
+        <url>https://github.com/bonitasoft/bonita-connector-jasper</url>
+        <tag>HEAD</tag>
     </scm>
 </project>
