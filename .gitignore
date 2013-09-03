@@ -1,1 +1,5 @@
-*.iml
+.settings
+target
+.classpath
+.project
+/.gitignore

@@ -7,8 +7,8 @@
 	<category id="reporting" icon="Reporting.png"/>
 	<category id="Jasper" icon="jasper.png" parentCategoryId="reporting" />
 
-	<input name="dbDriver" type="java.lang.String" mandatory="true" defaultValue="com.mysql.jdbc.Driver" />
-	<input name="jdbcUrl" type="java.lang.String" mandatory="true" defaultValue="jdbc:mysql://localhost/your_database_name" />
+	<input name="dbDriver" type="java.lang.String" defaultValue="com.mysql.jdbc.Driver" />
+	<input name="jdbcUrl" type="java.lang.String" defaultValue="jdbc:mysql://localhost/your_database_name" />
 	<input name="user" type="java.lang.String" mandatory="true" />
 	<input name="password" type="java.lang.String" />
 	<input name="jrxmlDocument" type="java.lang.String" mandatory="true" />

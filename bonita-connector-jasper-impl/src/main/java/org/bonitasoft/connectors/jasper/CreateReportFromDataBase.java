@@ -58,379 +58,383 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  */
 public class CreateReportFromDataBase extends AbstractConnector {
 
-    // input parameters
-    private static final String DB_DRIVER = "dbDriver";
+	// input parameters
+	private static final String DB_DRIVER = "dbDriver";
 
-    private static final String JDBC_URL = "jdbcUrl";
+	private static final String JDBC_URL = "jdbcUrl";
 
-    private static final String USER = "user";
+	private static final String USER = "user";
 
-    private static final String PASSWORD = "password";
+	private static final String PASSWORD = "password";
 
-    private static final String JRXML_DOC = "jrxmlDocument";
+	private static final String JRXML_DOC = "jrxmlDocument";
 
-    private static final String PARAMETERS = "parameters";
+	private static final String PARAMETERS = "parameters";
 
-    private static final String OUTPUT_FORMAT = "outputFormat";
+	private static final String OUTPUT_FORMAT = "outputFormat";
 
-    // output
-    private static final String REPORT_DOC_VALUE = "reportDocValue";
+	// output
+	private static final String REPORT_DOC_VALUE = "reportDocValue";
 
-    // Data base configuration
-    private String dbDriver;
+	// Data base configuration
+	private String dbDriver;
 
-    private String jdbcUrl;
+	private String jdbcUrl;
 
-    private String user;
+	private String user;
 
-    private String password;
+	private String password;
 
-    // Report settings
-    private String jrxmlDocument;
+	// Report settings
+	private String jrxmlDocument;
 
-    private byte[] jrxmlContent;
+	private byte[] jrxmlContent;
 
-    private Map<String, String> parameters = null;
+	private Map<String, String> parameters = null;
 
-    private String outputFormat;
+	private String outputFormat;
 
-    private Logger LOGGER = Logger.getLogger(this.getClass().getName());
+	private Logger LOGGER = Logger.getLogger(this.getClass().getName());
 
-    private static Connection conn = null;
-    private enum OutputFormat {
-        html, pdf, xml
+	private static Connection conn = null;
+	private enum OutputFormat {
+		html, pdf, xml
 
-    }
+	}
 
 
-    public Object getResult() {
-        return getOutputParameters().get(REPORT_DOC_VALUE);
-    }
+	public Object getResult() {
+		return getOutputParameters().get(REPORT_DOC_VALUE);
+	}
 
-    @SuppressWarnings("unchecked")
-    private void initInputs() {
-        dbDriver = (String) getInputParameter(DB_DRIVER);
-        LOGGER.info(DB_DRIVER + " " + dbDriver);
-        jdbcUrl = (String) getInputParameter(JDBC_URL);
-        LOGGER.info(JDBC_URL + " " + jdbcUrl);
+	@SuppressWarnings("unchecked")
+	private void initInputs() {
+		dbDriver = (String) getInputParameter(DB_DRIVER);
+		LOGGER.info(DB_DRIVER + " " + dbDriver);
+		jdbcUrl = (String) getInputParameter(JDBC_URL);
+		LOGGER.info(JDBC_URL + " " + jdbcUrl);
 
-        user = (String) getInputParameter(USER);
-        LOGGER.info(USER + " " + user);
+		user = (String) getInputParameter(USER);
+		LOGGER.info(USER + " " + user);
 
-        password = (String) getInputParameter(PASSWORD);
-        LOGGER.info(PASSWORD + " ******");
+		password = (String) getInputParameter(PASSWORD);
+		LOGGER.info(PASSWORD + " ******");
 
-        jrxmlDocument = (String) getInputParameter(JRXML_DOC);
-        LOGGER.info(JRXML_DOC + " " + jrxmlDocument);
+		jrxmlDocument = (String) getInputParameter(JRXML_DOC);
+		LOGGER.info(JRXML_DOC + " " + jrxmlDocument);
 
-        outputFormat = (String) getInputParameter(OUTPUT_FORMAT);
-        LOGGER.info(OUTPUT_FORMAT + " " + outputFormat);
+		outputFormat = (String) getInputParameter(OUTPUT_FORMAT);
+		LOGGER.info(OUTPUT_FORMAT + " " + outputFormat);
 
-        final List<List<Object>> parametersList = (List<List<Object>>) getInputParameter(PARAMETERS);
-        parameters = new HashMap<String, String>();
-        if (parametersList != null) {
-            // System.out.println("initInputs - parameters list :" + parametersList.toString());
-            for (List<Object> rows : parametersList) {
-                if (rows.size() == 2) {
-                    Object keyContent = rows.get(0);
-                    Object valueContent = rows.get(1);
-                    LOGGER.info("Parameter " + keyContent + " " + valueContent);
-                    if (keyContent != null && valueContent != null) {
-                        final String key = keyContent.toString();
-                        final String value = valueContent.toString();
-                        parameters.put(key, value);
-                    }
-                }
-            }
-        }
-    }
+		final List<List<Object>> parametersList = (List<List<Object>>) getInputParameter(PARAMETERS);
+		parameters = new HashMap<String, String>();
+		if (parametersList != null) {
+			// System.out.println("initInputs - parameters list :" + parametersList.toString());
+			for (List<Object> rows : parametersList) {
+				if (rows.size() == 2) {
+					Object keyContent = rows.get(0);
+					Object valueContent = rows.get(1);
+					LOGGER.info("Parameter " + keyContent + " " + valueContent);
+					if (keyContent != null && valueContent != null) {
+						final String key = keyContent.toString();
+						final String value = valueContent.toString();
+						parameters.put(key, value);
+					}
+				}
+			}
+		}
+	}
 
-    @Override
-    public void validateInputParameters() throws ConnectorValidationException {
-        initInputs();
-        final List<String> errors = new ArrayList<String>();
+	@Override
+	public void validateInputParameters() throws ConnectorValidationException {
+		initInputs();
+		final List<String> errors = new ArrayList<String>();
+		if (jrxmlDocument == null || jrxmlDocument.trim().length() == 0) {
+			errors.add("jrxmlDocument cannot be empty!");
+		}
 
-        if (jdbcUrl == null || jdbcUrl.trim().length() == 0) {
-            errors.add("jdbcUrl cannot be empty!");
-        }
-        if (jrxmlDocument == null || jrxmlDocument.trim().length() == 0) {
-            errors.add("jrxmlDocument cannot be empty!");
-        }
 
-        Long processInstanceId = getExecutionContext().getProcessInstanceId();
-        try {
-            Document document = getAPIAccessor().getProcessAPI().getLastDocument(processInstanceId, jrxmlDocument);
-            if (!document.hasContent() || !document.getContentFileName().matches(".*\\.jrxml")) {
-                errors.add("the jrxmlDocument " + document.getName() + " must have for content a jrxml file compatible with jasper v5");
-            }
-            else {
-                jrxmlContent = getAPIAccessor().getProcessAPI().getDocumentContent(document.getContentStorageId());
-            }
-        } catch (Exception e) {
-            errors.add(jrxmlDocument + " is not the name of a document defined in the process");
-        }
+		Long processInstanceId = getExecutionContext().getProcessInstanceId();
+		try {
+			Document document = getAPIAccessor().getProcessAPI().getLastDocument(processInstanceId, jrxmlDocument);
+			if (!document.hasContent() || !document.getContentFileName().matches(".*\\.jrxml")) {
+				errors.add("the jrxmlDocument " + document.getName() + " must have for content a jrxml file compatible with jasper v5");
+			}
+			else {
+				jrxmlContent = getAPIAccessor().getProcessAPI().getDocumentContent(document.getContentStorageId());
+			}
+		} catch (Exception e) {
+			errors.add(jrxmlDocument + " is not the name of a document defined in the process");
+		}
 
-        outputFormat = outputFormat.trim();
-        if (!OutputFormat.html.name().equalsIgnoreCase(outputFormat) && !OutputFormat.pdf.name().equalsIgnoreCase(outputFormat)
-                && !OutputFormat.xml.name().equalsIgnoreCase(outputFormat)) {
-            errors.add(outputFormat + " is not supported. Accepted outputFormats are : 'html', 'pdf' or 'xml' !");
-        }
-        if (!errors.isEmpty()) {
-            throw new ConnectorValidationException(this, errors);
-        }
+		outputFormat = outputFormat.trim();
+		if (!OutputFormat.html.name().equalsIgnoreCase(outputFormat) && !OutputFormat.pdf.name().equalsIgnoreCase(outputFormat)
+				&& !OutputFormat.xml.name().equalsIgnoreCase(outputFormat)) {
+			errors.add(outputFormat + " is not supported. Accepted outputFormats are : 'html', 'pdf' or 'xml' !");
+		}
+		if (!errors.isEmpty()) {
+			throw new ConnectorValidationException(this, errors);
+		}
 
-        // Load JDBC driver
-        // Check that jrxmlFile exists
-        // Test database connection
-        try {
-            databaseValidations(dbDriver, jrxmlDocument, jdbcUrl, user, password);
-        } catch (final ClassNotFoundException e) {
-            errors.add("dbDriver JDBC Driver not found!");
-        } catch (final DocumentNotFoundException dnfe) {
-            errors.add("jrxmlDocument '" + jrxmlDocument + "' not found!");
-        } catch (final SQLException e) {
-            errors.add("jdbcUrlCannot connect to database. Check 'jdbcUrl', 'user' and 'password' parameters. Message: " + e.getMessage());
-        } catch (InvalidSessionException ise) {
-            errors.add("InvalidSessionException" + ise.getMessage());
-        } catch (IOException ioe) {
-            errors.add("IOException" + ioe.getMessage());
-        }
-        if (!errors.isEmpty()) {
-            throw new ConnectorValidationException(this, errors);
-        }
-    }
+		// Load JDBC driver
+		// Check that jrxmlFile exists
+		// Test database connection
+		if(dbDriver != null && !dbDriver.isEmpty() && jdbcUrl != null && !jdbcUrl.isEmpty()){
+			try {
+				databaseValidations(dbDriver, jrxmlDocument, jdbcUrl, user, password);
+			} catch (final ClassNotFoundException e) {
+				errors.add("dbDriver JDBC Driver not found!");
+			} catch (final DocumentNotFoundException dnfe) {
+				errors.add("jrxmlDocument '" + jrxmlDocument + "' not found!");
+			} catch (final SQLException e) {
+				errors.add("jdbcUrlCannot connect to database. Check 'jdbcUrl', 'user' and 'password' parameters. Message: " + e.getMessage());
+			} catch (InvalidSessionException ise) {
+				errors.add("InvalidSessionException" + ise.getMessage());
+			} catch (IOException ioe) {
+				errors.add("IOException" + ioe.getMessage());
+			}
+		}
+		if (!errors.isEmpty()) {
+			throw new ConnectorValidationException(this, errors);
+		}
+	}
 
-    @Override
-    protected void executeBusinessLogic() throws ConnectorException {
-        try {
-            createJasperReportFromDataBase(dbDriver, jdbcUrl, user, password, jrxmlDocument, parameters, outputFormat);
-        } catch (final Exception e) {
-            throw new ConnectorException(e);
-        }
-    }
+	@Override
+	protected void executeBusinessLogic() throws ConnectorException {
+		try {
+			createJasperReportFromDataBase(dbDriver, jdbcUrl, user, password, jrxmlDocument, parameters, outputFormat);
+		} catch (final Exception e) {
+			throw new ConnectorException(e);
+		}
+	}
 
-    /**
-     * validate the database
-     * 
-     * @throws InvalidSessionException
-     * @throws IOException
-     * @throws ConnectorValidationException
-     */
-    public void databaseValidations(final String dbDriver, final String jrxmlDocument, final String jdbcUrl, final String user, final String password)
-            throws ClassNotFoundException, DocumentNotFoundException, SQLException, InvalidSessionException, IOException, ConnectorValidationException {
+	/**
+	 * validate the database
+	 * 
+	 * @throws InvalidSessionException
+	 * @throws IOException
+	 * @throws ConnectorValidationException
+	 */
+	public void databaseValidations(final String dbDriver, final String jrxmlDocument, final String jdbcUrl, final String user, final String password)
+			throws ClassNotFoundException, DocumentNotFoundException, SQLException, InvalidSessionException, IOException, ConnectorValidationException {
 
-        // Load JDBC driver
-        try {
-            Class.forName(dbDriver);
-        } catch (final ClassNotFoundException e) {
-            if (LOGGER.isLoggable(Level.WARNING)) {
-                LOGGER.warning("JDBC Driver not found. dbDriver=" + dbDriver);
-            }
-            throw e;
-        }
+		// Load JDBC driver
+		try {
+			Class.forName(dbDriver);
+		} catch (final ClassNotFoundException e) {
+			if (LOGGER.isLoggable(Level.WARNING)) {
+				LOGGER.warning("JDBC Driver not found. dbDriver=" + dbDriver);
+			}
+			throw e;
+		}
 
-        // Test database connection. this method is just for validation. no need close conn in finally code block.
-        try {
-            conn = DriverManager.getConnection(jdbcUrl, user, password);
-            conn.setAutoCommit(false);
-        } catch (final SQLException e) {
-            if (LOGGER.isLoggable(Level.WARNING)) {
-                LOGGER.warning("Connection error: " + e.getMessage());
-            }
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (final Exception e1) {
-                if (LOGGER.isLoggable(Level.WARNING)) {
-                    LOGGER.warning("Exception during finally. Message: " + e1.getMessage());
-                }
-            }
-            throw e;
-        }
+		// Test database connection. this method is just for validation. no need close conn in finally code block.
+		try {
+			conn = DriverManager.getConnection(jdbcUrl, user, password);
+			conn.setAutoCommit(false);
+		} catch (final SQLException e) {
+			if (LOGGER.isLoggable(Level.WARNING)) {
+				LOGGER.warning("Connection error: " + e.getMessage());
+			}
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (final Exception e1) {
+				if (LOGGER.isLoggable(Level.WARNING)) {
+					LOGGER.warning("Exception during finally. Message: " + e1.getMessage());
+				}
+			}
+			throw e;
+		}
 
-    }
+	}
 
-    private byte[] makeZip(String dir, List<String> filesList) throws IOException {
-        File outFolder = File.createTempFile("htmlZip", ".zip");
-        outFolder.deleteOnExit();
-        ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(outFolder)));
-        for (String strFile : filesList) {
-            byte[] data = new byte[1000];
-            out.putNextEntry(new ZipEntry(strFile.replaceFirst(".*" + dir + ".{1}", "")));
-            BufferedInputStream in = new BufferedInputStream(new FileInputStream(strFile));
-            int count;
-            while ((count = in.read(data)) != -1)
-            {
-                out.write(data, 0, count);
-            }
-            in.close();
-            out.closeEntry();
-        }
+	private byte[] makeZip(String dir, List<String> filesList) throws IOException {
+		File outFolder = File.createTempFile("htmlZip", ".zip");
+		outFolder.deleteOnExit();
+		ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(outFolder)));
+		for (String strFile : filesList) {
+			byte[] data = new byte[1000];
+			out.putNextEntry(new ZipEntry(strFile.replaceFirst(".*" + dir + ".{1}", "")));
+			BufferedInputStream in = new BufferedInputStream(new FileInputStream(strFile));
+			int count;
+			while ((count = in.read(data)) != -1)
+			{
+				out.write(data, 0, count);
+			}
+			in.close();
+			out.closeEntry();
+		}
 
-        out.flush();
-        out.close();
-        return IOUtil.getAllContentFrom(outFolder);
-    }
+		out.flush();
+		out.close();
+		return IOUtil.getAllContentFrom(outFolder);
+	}
 
-    private List<String> selectZipFiles(File srcDir, String pattern, Long delay) throws Exception {
-        List<String> fList = new ArrayList<String>();
-        if (!srcDir.isDirectory()) {
-            throw new Exception(srcDir + " must be a directory");
-        }
-        for (File f : srcDir.listFiles()) {
-            if (f.getName().contains(pattern) && f.lastModified() > (System.currentTimeMillis() - delay)) {
-                if (f.isDirectory()) {
-                    fList.addAll(selectZipFiles(f, "", 5000L));
-                }
-                else {
-                    fList.add(f.getCanonicalPath());
-                }
-            }
-        }
-        return fList;
-    }
+	private List<String> selectZipFiles(File srcDir, String pattern, Long delay) throws Exception {
+		List<String> fList = new ArrayList<String>();
+		if (!srcDir.isDirectory()) {
+			throw new Exception(srcDir + " must be a directory");
+		}
+		for (File f : srcDir.listFiles()) {
+			if (f.getName().contains(pattern) && f.lastModified() > (System.currentTimeMillis() - delay)) {
+				if (f.isDirectory()) {
+					fList.addAll(selectZipFiles(f, "", 5000L));
+				}
+				else {
+					fList.add(f.getCanonicalPath());
+				}
+			}
+		}
+		return fList;
+	}
 
-    public void createJasperReportFromDataBase(final String dbDriver, final String jdbcUrl, final String user, final String password,
-            final String jrxmlDocument, final Map<String, String> parameters, final String outputFormat) throws Exception {
-        if (LOGGER.isLoggable(Level.INFO)) {
-            LOGGER.info("Creating a new Jasper Report from database");
-        }
+	public void createJasperReportFromDataBase(final String dbDriver, final String jdbcUrl, final String user, final String password,
+			final String jrxmlDocument, final Map<String, String> parameters, final String outputFormat) throws Exception {
+		if (LOGGER.isLoggable(Level.INFO)) {
+			LOGGER.info("Creating a new Jasper Report from database");
+		}
 
-        try {
-            final JasperReport report = JasperCompileManager.compileReport(new ByteArrayInputStream(jrxmlContent));
-            final Map<String, Object> typedParameters = getTypedParameters(report, parameters);
-            final JasperPrint print = JasperFillManager.fillReport(report, typedParameters, conn);
+		try {
+			final JasperReport report = JasperCompileManager.compileReport(new ByteArrayInputStream(jrxmlContent));
+			final Map<String, Object> typedParameters = getTypedParameters(report, parameters);
+			JasperPrint print = null;
+			if(conn != null){
+				 print = JasperFillManager.fillReport(report, typedParameters, conn);
+			}else{
+				 print = JasperFillManager.fillReport(report, typedParameters);
+			}
 
-            byte[] content;
-            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-            String mimeType = "";
-            String suffix = "." + outputFormat;
-            // Export file to selected document
-            if (OutputFormat.pdf.name().equalsIgnoreCase(outputFormat)) {
-                JasperExportManager.exportReportToPdfStream(print, outStream);
-                content = outStream.toByteArray();
-                mimeType = "application/pdf";
-            }
-            else if (OutputFormat.html.name().equalsIgnoreCase(outputFormat)) {
-                File htmlFile = File.createTempFile("jasperReport", ".html");
-                htmlFile.deleteOnExit();
-                JasperExportManager.exportReportToHtmlFile(print, htmlFile.getCanonicalPath());
-                List<String> filesForZip = selectZipFiles(htmlFile.getParentFile(), "html", 10000L);
-                content = makeZip(htmlFile.getParentFile().getName(), filesForZip);
-                mimeType = "application/zip";
-                suffix = suffix + ".zip";
-            }
-            else if (OutputFormat.xml.name().equalsIgnoreCase(outputFormat)) {
-                JasperExportManager.exportReportToXmlStream(print, outStream);
-                content = outStream.toByteArray();
-                mimeType = "application/xml";
-            }
-            else {
-                final String errorMessage = outputFormat + " is not supported. Accepted outputFormats are : 'html', 'pdf' or 'xml' !";
-                if (LOGGER.isLoggable(Level.WARNING)) {
-                    LOGGER.warning(errorMessage);
-                }
-                throw new IllegalArgumentException(errorMessage);
-            }
+			byte[] content;
+			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+			String mimeType = "";
+			String suffix = "." + outputFormat;
+			// Export file to selected document
+			if (OutputFormat.pdf.name().equalsIgnoreCase(outputFormat)) {
+				JasperExportManager.exportReportToPdfStream(print, outStream);
+				content = outStream.toByteArray();
+				mimeType = "application/pdf";
+			}
+			else if (OutputFormat.html.name().equalsIgnoreCase(outputFormat)) {
+				File htmlFile = File.createTempFile("jasperReport", ".html");
+				htmlFile.deleteOnExit();
+				JasperExportManager.exportReportToHtmlFile(print, htmlFile.getCanonicalPath());
+				List<String> filesForZip = selectZipFiles(htmlFile.getParentFile(), "html", 10000L);
+				content = makeZip(htmlFile.getParentFile().getName(), filesForZip);
+				mimeType = "application/zip";
+				suffix = suffix + ".zip";
+			}
+			else if (OutputFormat.xml.name().equalsIgnoreCase(outputFormat)) {
+				JasperExportManager.exportReportToXmlStream(print, outStream);
+				content = outStream.toByteArray();
+				mimeType = "application/xml";
+			}
+			else {
+				final String errorMessage = outputFormat + " is not supported. Accepted outputFormats are : 'html', 'pdf' or 'xml' !";
+				if (LOGGER.isLoggable(Level.WARNING)) {
+					LOGGER.warning(errorMessage);
+				}
+				throw new IllegalArgumentException(errorMessage);
+			}
 
-            DocumentValue docValue = new DocumentValue(content, mimeType, "jasper_report" + suffix);
-            setOutputParameter(REPORT_DOC_VALUE, docValue);
-            // Visualize new report file
-            // JasperViewer.viewReport(print, false);
-        } catch (final Exception e) {
-            if (LOGGER.isLoggable(Level.WARNING)) {
-                LOGGER.warning(e.toString());
-            }
-            throw e;
-        } finally {
-            // Cleanup before exit.
-            try {
-                if (conn != null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (final Exception e) {
-                if (LOGGER.isLoggable(Level.WARNING)) {
-                    LOGGER.warning("Exception during finally. Message: " + e.getMessage());
-                }
-                throw e;
-            }
-        }
-    }
+			DocumentValue docValue = new DocumentValue(content, mimeType, "jasper_report" + suffix);
+			setOutputParameter(REPORT_DOC_VALUE, docValue);
+			// Visualize new report file
+			// JasperViewer.viewReport(print, false);
+		} catch (final Exception e) {
+			if (LOGGER.isLoggable(Level.WARNING)) {
+				LOGGER.warning(e.toString());
+			}
+			throw e;
+		} finally {
+			// Cleanup before exit.
+			try {
+				if (conn != null) {
+					conn.rollback();
+					conn.close();
+				}
+			} catch (final Exception e) {
+				if (LOGGER.isLoggable(Level.WARNING)) {
+					LOGGER.warning("Exception during finally. Message: " + e.getMessage());
+				}
+				throw e;
+			}
+		}
+	}
 
-    private Map<String, Object> getTypedParameters(final JasperReport report, final Map<String, String> parameters) {
-        final Map<String, Object> typedParameters = new HashMap<String, Object>();
-        for (final JRParameter param : report.getParameters()) {
-            final String paramName = param.getName();
-            final String paramType = param.getValueClassName();
-            final String value = parameters.get(paramName);
-            if (value != null && paramType != null) {
-                if (paramType.equals(String.class.getName())) {
-                    typedParameters.put(paramName, value);
-                } else if (paramType.equals(Integer.class.getName())) {
-                    try {
-                        final Integer typedValue = Integer.parseInt(value);
-                        typedParameters.put(paramName, typedValue);
-                    } catch (final NumberFormatException e) {
-                        throw new IllegalArgumentException("Invalid parameter type for " + paramName + ": " + Integer.class.getName()
-                                + " value is expected, current is " + value);
-                    }
-                } else if (paramType.equals(Short.class.getName())) {
-                    try {
-                        final Short typedValue = Short.parseShort(value);
-                        typedParameters.put(paramName, typedValue);
-                    } catch (final NumberFormatException e) {
-                        throw new IllegalArgumentException("Invalid parameter type for " + paramName + ": " + Short.class.getName()
-                                + " value is expected, current is " + value);
-                    }
-                } else if (paramType.equals(Long.class.getName())) {
-                    try {
-                        final Long typedValue = Long.parseLong(value);
-                        typedParameters.put(paramName, typedValue);
-                    } catch (final NumberFormatException e) {
-                        throw new IllegalArgumentException("Invalid parameter type for " + paramName + ": " + Long.class.getName()
-                                + " value is expected, current is " + value);
-                    }
-                } else if (paramType.equals(Double.class.getName())) {
-                    try {
-                        final Double typedValue = Double.parseDouble(value);
-                        typedParameters.put(paramName, typedValue);
-                    } catch (final NumberFormatException e) {
-                        throw new IllegalArgumentException("Invalid parameter type for " + paramName + ": " + Double.class.getName()
-                                + " value is expected, current is " + value);
-                    }
-                } else if (paramType.equals(Float.class.getName())) {
-                    try {
-                        final Float typedValue = Float.parseFloat(value);
-                        typedParameters.put(paramName, typedValue);
-                    } catch (final NumberFormatException e) {
-                        throw new IllegalArgumentException("Invalid parameter type for " + paramName + ": " + Float.class.getName()
-                                + " value is expected, current is " + value);
-                    }
-                } else if (paramType.equals(BigDecimal.class.getName())) {
-                    try {
-                        final BigDecimal typedValue = new BigDecimal(value);
-                        typedParameters.put(paramName, typedValue);
-                    } catch (final NumberFormatException e) {
-                        throw new IllegalArgumentException("Invalid parameter type for " + paramName + ": " + BigDecimal.class.getName()
-                                + " value is expected, current is " + value);
-                    }
-                } else if (paramType.equals(Date.class.getName())) {
-                    try {
-                        final Date typedValue = new SimpleDateFormat().parse(value);
-                        typedParameters.put(paramName, typedValue);
-                    } catch (final ParseException e) {
-                        throw new IllegalArgumentException("Invalid parameter type for " + paramName + ": " + Date.class.getName()
-                                + " value is expected, current is " + value);
-                    }
-                } else if (paramType.equals(Boolean.class.getName())) {
-                    final Boolean typedValue = Boolean.parseBoolean(value);
-                    typedParameters.put(paramName, typedValue);
-                }
-            }
-        }
-        return typedParameters;
-    }
+	private Map<String, Object> getTypedParameters(final JasperReport report, final Map<String, String> parameters) {
+		final Map<String, Object> typedParameters = new HashMap<String, Object>();
+		for (final JRParameter param : report.getParameters()) {
+			final String paramName = param.getName();
+			final String paramType = param.getValueClassName();
+			final String value = parameters.get(paramName);
+			if (value != null && paramType != null) {
+				if (paramType.equals(String.class.getName())) {
+					typedParameters.put(paramName, value);
+				} else if (paramType.equals(Integer.class.getName())) {
+					try {
+						final Integer typedValue = Integer.parseInt(value);
+						typedParameters.put(paramName, typedValue);
+					} catch (final NumberFormatException e) {
+						throw new IllegalArgumentException("Invalid parameter type for " + paramName + ": " + Integer.class.getName()
+								+ " value is expected, current is " + value);
+					}
+				} else if (paramType.equals(Short.class.getName())) {
+					try {
+						final Short typedValue = Short.parseShort(value);
+						typedParameters.put(paramName, typedValue);
+					} catch (final NumberFormatException e) {
+						throw new IllegalArgumentException("Invalid parameter type for " + paramName + ": " + Short.class.getName()
+								+ " value is expected, current is " + value);
+					}
+				} else if (paramType.equals(Long.class.getName())) {
+					try {
+						final Long typedValue = Long.parseLong(value);
+						typedParameters.put(paramName, typedValue);
+					} catch (final NumberFormatException e) {
+						throw new IllegalArgumentException("Invalid parameter type for " + paramName + ": " + Long.class.getName()
+								+ " value is expected, current is " + value);
+					}
+				} else if (paramType.equals(Double.class.getName())) {
+					try {
+						final Double typedValue = Double.parseDouble(value);
+						typedParameters.put(paramName, typedValue);
+					} catch (final NumberFormatException e) {
+						throw new IllegalArgumentException("Invalid parameter type for " + paramName + ": " + Double.class.getName()
+								+ " value is expected, current is " + value);
+					}
+				} else if (paramType.equals(Float.class.getName())) {
+					try {
+						final Float typedValue = Float.parseFloat(value);
+						typedParameters.put(paramName, typedValue);
+					} catch (final NumberFormatException e) {
+						throw new IllegalArgumentException("Invalid parameter type for " + paramName + ": " + Float.class.getName()
+								+ " value is expected, current is " + value);
+					}
+				} else if (paramType.equals(BigDecimal.class.getName())) {
+					try {
+						final BigDecimal typedValue = new BigDecimal(value);
+						typedParameters.put(paramName, typedValue);
+					} catch (final NumberFormatException e) {
+						throw new IllegalArgumentException("Invalid parameter type for " + paramName + ": " + BigDecimal.class.getName()
+								+ " value is expected, current is " + value);
+					}
+				} else if (paramType.equals(Date.class.getName())) {
+					try {
+						final Date typedValue = new SimpleDateFormat().parse(value);
+						typedParameters.put(paramName, typedValue);
+					} catch (final ParseException e) {
+						throw new IllegalArgumentException("Invalid parameter type for " + paramName + ": " + Date.class.getName()
+								+ " value is expected, current is " + value);
+					}
+				} else if (paramType.equals(Boolean.class.getName())) {
+					final Boolean typedValue = Boolean.parseBoolean(value);
+					typedParameters.put(paramName, typedValue);
+				}
+			}
+		}
+		return typedParameters;
+	}
 
 }
