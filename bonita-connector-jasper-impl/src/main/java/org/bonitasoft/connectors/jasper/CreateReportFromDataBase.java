@@ -299,12 +299,7 @@ public class CreateReportFromDataBase extends AbstractConnector {
 		try {
 			final JasperReport report = JasperCompileManager.compileReport(new ByteArrayInputStream(jrxmlContent));
 			final Map<String, Object> typedParameters = getTypedParameters(report, parameters);
-			JasperPrint print = null;
-			if(conn != null){
-				 print = JasperFillManager.fillReport(report, typedParameters, conn);
-			}else{
-				 print = JasperFillManager.fillReport(report, typedParameters);
-			}
+ 			final JasperPrint print = JasperFillManager.fillReport(report, typedParameters, conn);
 
 			byte[] content;
 			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
