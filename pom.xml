@@ -9,7 +9,7 @@
 	</parent>
 	
 	<artifactId>bonita-connector-jasper</artifactId>
-    <version>6.1.0-SNAPSHOT</version>
+    <version>6.1.0-rc-07</version>
     <packaging>pom</packaging>
 
 	<name>bonita-connector-jasper</name>
@@ -33,6 +33,6 @@
         <developerConnection>scm:git:git@github.com:bonitasoft/bonita-connector-jasper.git</developerConnection>
         <connection>scm:git:git@github.com:bonitasoft/bonita-connector-jasper.git</connection>
         <url>https://github.com/bonitasoft/bonita-connector-jasper</url>
-        <tag>HEAD</tag>
+        <tag>bonita-connector-jasper-6.1.0-rc-07</tag>
     </scm>
 </project>
