@@ -46,8 +46,6 @@ import org.bonitasoft.engine.connector.ConnectorValidationException;
 import org.bonitasoft.engine.connector.EngineExecutionContext;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -142,8 +140,6 @@ public class CreateReportFromDataBaseTest {
      * 
      * @throws BonitaException
      */
-    @Cover(classes = { CreateReportFromDataBase.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Jasper Report" },
-            jira = "ENGINE-687", story = "Tests that parameters of the connector are validated")
     @Test
     // @Ignore("Need a report1.jrxml + a filled up database....")
     public void testGoodParameters() throws Exception {
@@ -157,8 +153,6 @@ public class CreateReportFromDataBaseTest {
      * 
      * @throws BonitaException
      */
-    @Cover(classes = { CreateReportFromDataBase.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Jasper Report" },
-            exceptions = ConnectorValidationException.class, jira = "ENGINE-687", story = "Tests that validation fails if driver is null")
     @Test(expected = ConnectorValidationException.class)
     public void testNullParameter() throws Exception {
         getMockedContext();
@@ -175,8 +169,6 @@ public class CreateReportFromDataBaseTest {
      * 
      * @throws BonitaException
      */
-    @Cover(classes = { CreateReportFromDataBase.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Jasper Report" },
-            exceptions = ConnectorValidationException.class, jira = "ENGINE-687", story = "Tests that validation fails driver is invalid")
     @Test(expected = ConnectorValidationException.class)
     public void testWrongDbDriver() throws Exception {
         getMockedContext();
@@ -195,8 +187,6 @@ public class CreateReportFromDataBaseTest {
      * 
      */
 
-    @Cover(classes = { CreateReportFromDataBase.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Jasper Report" },
-            exceptions = ConnectorValidationException.class, jira = "ENGINE-687", story = "Tests that validation fails if jrxmlDoc i not the name of a valid jrxml document")
     @Test(expected = ConnectorValidationException.class)
     public void testWrongJrxmlDocument() throws Exception {
         getMockedContext();
@@ -213,8 +203,6 @@ public class CreateReportFromDataBaseTest {
      * 
      * @throws BonitaException
      */
-    @Cover(classes = { CreateReportFromDataBase.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Jasper Report" },
-            exceptions = ConnectorValidationException.class, jira = "ENGINE-687", story = "Tests that validation fails db url is invalid")
     @Test(expected = ConnectorValidationException.class)
     public void testWrongJdbcUrl() throws Exception {
         getMockedContext();
@@ -231,8 +219,6 @@ public class CreateReportFromDataBaseTest {
      * 
      * @throws BonitaException
      */
-    @Cover(classes = { CreateReportFromDataBase.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Jasper Report" },
-            exceptions = ConnectorValidationException.class, jira = "ENGINE-687", story = "Tests that validation fails if db username is invalid")
     @Test(expected = ConnectorValidationException.class)
     public void testWrongDbUser() throws Exception {
         getMockedContext();
@@ -250,8 +236,6 @@ public class CreateReportFromDataBaseTest {
      * 
      * @throws BonitaException
      */
-    @Cover(classes = { CreateReportFromDataBase.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Jasper Report" },
-            exceptions = ConnectorValidationException.class, jira = "ENGINE-687", story = "Tests that validation fails if db password is invalid")
     @Test(expected = ConnectorValidationException.class)
     public void testWrongDbPassword() throws Exception {
         getMockedContext();
@@ -268,8 +252,6 @@ public class CreateReportFromDataBaseTest {
      * 
      * @throws BonitaException
      */
-    @Cover(classes = { CreateReportFromDataBase.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Jasper Report" },
-            exceptions = ConnectorValidationException.class, jira = "ENGINE-687", story = "Tests that validation fails if format is not supported (pdf,html,xml)")
     @Test(expected = ConnectorValidationException.class)
     public void testOutputFormat() throws Exception {
         getMockedContext();
@@ -296,8 +278,6 @@ public class CreateReportFromDataBaseTest {
      * test create a report fail.
      */
     @Test
-    @Cover(classes = { CreateReportFromDataBase.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Jasper Report" },
-            exceptions = ConnectorException.class, jira = "ENGINE-687", story = "Test that if failure to generate reports produces an exception")
     public void testCreateAReportFail() throws Exception {
         getMockedContext();
         final CreateReportFromDataBase connector = getWorkingConnector("pdf");
@@ -318,8 +298,6 @@ public class CreateReportFromDataBaseTest {
      * @throws Exception
      */
     @Test
-    @Cover(classes = { CreateReportFromDataBase.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Jasper Report, html" },
-            exceptions = ConnectorValidationException.class, jira = "ENGINE-687", story = "Generation of a jasper html report")
     public void testCreateAReportHtml() throws Exception {
 
         getMockedContext();
@@ -345,8 +323,6 @@ public class CreateReportFromDataBaseTest {
      * @throws Exception
      */
     @Test
-    @Cover(classes = { CreateReportFromDataBase.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Jasper Report, xml" },
-            exceptions = ConnectorValidationException.class, jira = "ENGINE-687", story = "Generation of a jasper xml report")
     public void testCreateAReportXml() throws Exception {
 
         getMockedContext();
@@ -373,8 +349,6 @@ public class CreateReportFromDataBaseTest {
      * @throws Exception
      */
     @Test
-    @Cover(classes = { CreateReportFromDataBase.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Jasper Report, pdf" },
-            exceptions = ConnectorValidationException.class, jira = "ENGINE-687", story = "Generation of a jasper pdf report")
     public void testCreateAReportPdf() throws Exception {
 
         getMockedContext();
