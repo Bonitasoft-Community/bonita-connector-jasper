@@ -149,9 +149,10 @@ public class CreateReportFromDataBase extends AbstractConnector {
 	public void validateInputParameters() throws ConnectorValidationException {
 		initInputs();
 		final List<String> errors = new ArrayList<String>();
-        if (jrxmlDocument == null || jrxmlDocument.trim().length() == 0) {
-            errors.add("jrxmlDocument cannot be empty!");
-        }
+		if (jrxmlDocument == null || jrxmlDocument.trim().length() == 0) {
+			errors.add("jrxmlDocument cannot be empty!");
+		}
+
 
 		Long processInstanceId = getExecutionContext().getProcessInstanceId();
 		try {
@@ -178,20 +179,26 @@ public class CreateReportFromDataBase extends AbstractConnector {
 		// Load JDBC driver
 		// Check that jrxmlFile exists
 		// Test database connection
-		if(dbDriver != null && !dbDriver.isEmpty() && jdbcUrl != null && !jdbcUrl.isEmpty()){
-			try {
-				databaseValidations(dbDriver, jrxmlDocument, jdbcUrl, user, password);
-			} catch (final ClassNotFoundException e) {
-				errors.add("dbDriver JDBC Driver not found!");
-			} catch (final DocumentNotFoundException dnfe) {
-				errors.add("jrxmlDocument '" + jrxmlDocument + "' not found!");
-			} catch (final SQLException e) {
-				errors.add("jdbcUrlCannot connect to database. Check 'jdbcUrl', 'user' and 'password' parameters. Message: " + e.getMessage());
-			} catch (InvalidSessionException ise) {
-				errors.add("InvalidSessionException" + ise.getMessage());
-			} catch (IOException ioe) {
-				errors.add("IOException" + ioe.getMessage());
+		if(dbDriver != null && !dbDriver.isEmpty()){
+			if(jdbcUrl != null && !jdbcUrl.isEmpty()){
+				try {
+					databaseValidations(dbDriver, jrxmlDocument, jdbcUrl, user, password);
+				} catch (final ClassNotFoundException e) {
+					errors.add("dbDriver JDBC Driver not found!");
+				} catch (final DocumentNotFoundException dnfe) {
+					errors.add("jrxmlDocument '" + jrxmlDocument + "' not found!");
+				} catch (final SQLException e) {
+					errors.add("jdbcUrlCannot connect to database. Check 'jdbcUrl', 'user' and 'password' parameters. Message: " + e.getMessage());
+				} catch (InvalidSessionException ise) {
+					errors.add("InvalidSessionException" + ise.getMessage());
+				} catch (IOException ioe) {
+					errors.add("IOException" + ioe.getMessage());
+				}
+			} else {
+				errors.add("jdbc URl has not been specified.");
 			}
+		} else {
+			errors.add("db Driver has not been specified.");
 		}
 		if (!errors.isEmpty()) {
 			throw new ConnectorValidationException(this, errors);
@@ -298,12 +305,7 @@ public class CreateReportFromDataBase extends AbstractConnector {
 		try {
 			final JasperReport report = JasperCompileManager.compileReport(new ByteArrayInputStream(jrxmlContent));
 			final Map<String, Object> typedParameters = getTypedParameters(report, parameters);
-			JasperPrint print = null;
-			if(conn != null){
-				 print = JasperFillManager.fillReport(report, typedParameters, conn);
-			}else{
-				 print = JasperFillManager.fillReport(report, typedParameters);
-			}
+ 			final JasperPrint print = JasperFillManager.fillReport(report, typedParameters, conn);
 
 			byte[] content;
 			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
