@@ -7,7 +7,7 @@
 	<description>Implementation based on jasper 5.0.4</description>
 	<implementationClassname>org.bonitasoft.connectors.jasper.CreateReportFromDataBase</implementationClassname>
 	<implementationId>jasper-impl</implementationId>
-	<implementationVersion>1.0.3</implementationVersion>
+	<implementationVersion>$implementation.version$</implementationVersion>
 
 $Dependencies$
 
