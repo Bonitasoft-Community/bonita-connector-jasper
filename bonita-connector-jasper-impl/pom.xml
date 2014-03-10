@@ -10,9 +10,10 @@
 	</parent>
 
 	<artifactId>bonita-connector-jasper-impl</artifactId>
+	<version>1.0.0</version>
 
 	<properties>
-		<implementation.id>jasper</implementation.id>
+		<definition.version>1.0.0</definition.version>
 	</properties>
 
 	<dependencies>
@@ -52,7 +53,7 @@
 		<dependency>
 			<groupId>org.bonitasoft.connectors</groupId>
 			<artifactId>bonita-connector-jasper-def</artifactId>
-			<version>${project.version}</version>
+			<version>${definition.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
