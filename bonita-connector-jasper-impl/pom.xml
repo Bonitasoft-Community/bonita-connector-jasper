@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>bonita-connector-jasper-impl</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <properties>
         <definition.version>1.0.0</definition.version>
