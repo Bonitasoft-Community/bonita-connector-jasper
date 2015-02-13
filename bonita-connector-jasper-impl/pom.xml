@@ -89,7 +89,11 @@
             <artifactId>jasperreports-jtidy-r938</artifactId>
             <version>1.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.lowagie</groupId>
+            <artifactId>itext-asian</artifactId>
+            <version>2.1.7</version>
+        </dependency>
     </dependencies>
 
     <build>
