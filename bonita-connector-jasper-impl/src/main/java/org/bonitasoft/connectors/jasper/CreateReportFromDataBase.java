@@ -96,7 +96,8 @@ public class CreateReportFromDataBase extends AbstractConnector {
 
 	private Logger LOGGER = Logger.getLogger(this.getClass().getName());
 
-	private static Connection conn = null;
+	private Connection conn = null;
+	
 	private enum OutputFormat {
 		html, pdf, xml
 
