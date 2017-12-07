@@ -32,6 +32,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- Needed to work on Java 8, shipped version 3.1.0 does not work with java 8  -->
+		<dependency>
+			<groupId>org.eclipse.jdt</groupId>
+			<artifactId>org.eclipse.jdt.core</artifactId>
+			<version>3.13.50</version>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
