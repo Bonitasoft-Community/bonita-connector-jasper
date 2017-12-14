@@ -157,10 +157,22 @@ public class CreateReportFromDataBaseTest {
     public void testNullParameter() throws Exception {
         getMockedContext();
         final CreateReportFromDataBase connector = getWorkingConnector("pdf");
-        final String wrongDbDriver = null;
         final Map<String, Object> inputs = new HashMap<String, Object>();
-        inputs.put(DB_DRIVER, wrongDbDriver);
+        inputs.put(JRXML_DOC, null);
         connector.setInputParameters(inputs);
+        connector.validateInputParameters();
+    }
+
+    @Test
+    public void should_not_fail_if_database_connection_is_not_set() throws Exception {
+        getMockedContext();
+        final CreateReportFromDataBase connector = getWorkingConnector("pdf");
+
+        final Map<String, Object> inputs = new HashMap<String, Object>();
+        inputs.put(DB_DRIVER, "");
+        inputs.put(JDBC_URL, "");
+        connector.setInputParameters(inputs);
+
         connector.validateInputParameters();
     }
 
