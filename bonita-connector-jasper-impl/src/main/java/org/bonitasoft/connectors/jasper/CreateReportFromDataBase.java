@@ -195,11 +195,7 @@ public class CreateReportFromDataBase extends AbstractConnector {
 				} catch (IOException ioe) {
 					errors.add("IOException" + ioe.getMessage());
 				}
-			} else {
-				errors.add("jdbc URl has not been specified.");
 			}
-		} else {
-			errors.add("db Driver has not been specified.");
 		}
 		if (!errors.isEmpty()) {
 			throw new ConnectorValidationException(this, errors);
