@@ -14,36 +14,27 @@
  */
 package org.bonitasoft.connectors.jasper;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import net.sf.jasperreports.engine.JRParameter;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.design.JRCompiler;
+import net.sf.jasperreports.engine.design.JRJavacCompiler;
+import net.sf.jasperreports.engine.design.JRJdk13Compiler;
+import net.sf.jasperreports.engine.util.JRClassLoader;
+import net.sf.jasperreports.engine.util.LocalJasperReportsContext;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
@@ -300,7 +291,7 @@ public class CreateReportFromDataBase extends AbstractConnector {
 		}
 
 		try {
-			final JasperReport report = JasperCompileManager.compileReport(new ByteArrayInputStream(jrxmlContent));
+			final JasperReport report = compile(new ByteArrayInputStream(jrxmlContent));
 			final Map<String, Object> typedParameters = getTypedParameters(report, parameters);
  			final JasperPrint print = JasperFillManager.fillReport(report, typedParameters, conn);
 
@@ -359,6 +350,25 @@ public class CreateReportFromDataBase extends AbstractConnector {
 				throw e;
 			}
 		}
+	}
+
+	private JasperReport compile(InputStream inputStream) throws JRException {
+		try{
+			return getCompiler().compile(inputStream);
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOGGER.warning("Unable to compile report with custom compiler, using jasper defaults");
+			LOGGER.log(Level.FINEST, "cause of the failed compilation: ", e);
+		}
+		return JasperCompileManager.compileReport(inputStream);
+	}
+
+	private JasperCompileManager getCompiler() {
+		LocalJasperReportsContext jasperReportsContext = new LocalJasperReportsContext(DefaultJasperReportsContext.getInstance());
+		JRJdtCompiler.jasperReportsContext = jasperReportsContext;
+		jasperReportsContext.setProperty("net.sf.jasperreports.compiler.java", "org.bonitasoft.connectors.jasper.JRJdtCompiler");
+		jasperReportsContext.setClassLoader(Thread.currentThread().getContextClassLoader());
+		return JasperCompileManager.getInstance(jasperReportsContext);
 	}
 
 	private Map<String, Object> getTypedParameters(final JasperReport report, final Map<String, String> parameters) {

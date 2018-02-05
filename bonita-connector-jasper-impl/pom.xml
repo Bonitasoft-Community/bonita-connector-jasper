@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>bonita-connector-jasper-impl</artifactId>
-	<version>1.0.5</version>
+	<version>1.0.6</version>
 
 	<properties>
 		<definition.version>1.0.0</definition.version>
@@ -31,6 +31,13 @@
 					<artifactId>jdtcore</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<!-- This compiler is present in the classpath of the engine-->
+		<dependency>
+			<groupId>org.eclipse.jdt.core.compiler</groupId>
+			<artifactId>ecj</artifactId>
+			<version>4.6.1</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
