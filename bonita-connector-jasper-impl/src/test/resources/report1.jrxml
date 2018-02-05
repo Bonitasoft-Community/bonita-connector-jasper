@@ -28,6 +28,7 @@
 	<pageHeader>
 		<band height="91" splitType="Stretch"/>
 	</pageHeader>
+
 	<columnHeader>
 		<band height="24" splitType="Stretch">
 			<staticText>
@@ -73,6 +74,11 @@
 				<reportElement uuid="04d3194e-e881-44cd-b9cd-30357ab81335" x="397" y="0" width="100" height="20"/>
 				<textElement/>
 				<textFieldExpression><![CDATA[$F{CITY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="04d3194e-e881-44cd-b9cd-30357ab81335" x="397" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
